@@ -1,5 +1,7 @@
 package br.com.alura.forumhub.domain.topico;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,13 +26,17 @@ public class Topico {
     private String titulo;
     private String mensagem;
     private String curso;
-    private String nome;
+    private String autor;
+    private LocalDateTime data;
+    private Boolean status;
 
     public Topico(DadosCadastroTopico dados) {
         this.titulo = dados.titulo();
         this.mensagem = dados.mensagem();
         this.curso = dados.curso();
-        this.nome = dados.nome();
+        this.autor = dados.autor();
+        this.data = LocalDateTime.now();
+        this.status = true;
 
     }
 

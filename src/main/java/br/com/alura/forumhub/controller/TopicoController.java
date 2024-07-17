@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.alura.forumhub.domain.topico.DadosCadastroTopico;
 import br.com.alura.forumhub.domain.topico.DadosDetalhamentoTopico;
@@ -19,7 +18,7 @@ import br.com.alura.forumhub.repository.TopicoRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("topicos")
@@ -31,21 +30,25 @@ public class TopicoController {
     @SuppressWarnings("rawtypes")
     @PostMapping
     @Transactional
-    public ResponseEntity cadastrar(@RequestBody @Valid DadosCadastroTopico dados, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity cadastrarTopico(@RequestBody @Valid DadosCadastroTopico dados) {
         var topico = new Topico(dados);
         repository.save(topico);
 
-        var uri = uriBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
-
-        return ResponseEntity.created(uri).body(new DadosDetalhamentoTopico(topico));
+        return ResponseEntity.ok().body(topico);
     }
 
     @GetMapping
     public ResponseEntity<Page<DadosListagemTopico>> listarTodosTopicos(
-            @PageableDefault(sort = { "title" }, size = 10) Pageable paginacao) {
+            @PageableDefault(sort = { "titulo" }, size = 10) Pageable paginacao) {
         var topicos = repository.findAll(paginacao).map(DadosListagemTopico::new);
-
         return ResponseEntity.ok().body(topicos);
+    }
+
+    @SuppressWarnings("rawtypes")
+    @GetMapping("/{id}")
+    public ResponseEntity detalharTopico(@PathVariable Long id) {
+        var topico = repository.getReferenceById(id);
+        return ResponseEntity.ok(new DadosDetalhamentoTopico(topico));
     }
 
 }
